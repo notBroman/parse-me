@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 csv = "1.3.0"
+polars = "0.40.0"
+time = { version = "0.3.36", default_features = true, features = ["formatting", "parsing", "macros"] }
+
