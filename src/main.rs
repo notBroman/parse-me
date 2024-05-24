@@ -16,47 +16,62 @@ struct Entry {
     balance: i32
 }
 
+struct Summary {
+    month: time::Month,
+    food_total: i32,
+    misc_total: i32,
+    housing_total: i32,
+    incoming: i32,
+    outgoing: i32,
+}
+
+impl From<StringRecord> for Entry {
+
+    fn from(record: StringRecord) -> Self {
+        let format = time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
+        Entry {
+            what: record.get(0).unwrap().to_string().clone(),
+            product: record.get(1).unwrap().to_string().clone(),
+            started: PrimitiveDateTime::parse(record.get(2)
+                .expect("Slice should not be empty"), &format).unwrap(),
+            completed: PrimitiveDateTime::parse(record.get(3).
+                expect("Slice should not be enpty"), &format).unwrap(),
+            description: record.get(4).unwrap().to_string().clone(),
+            amount: i32::from_str_radix(record.get(5).unwrap(), 10).unwrap(),
+            fee: i32::from_str_radix(record.get(6).unwrap(), 10).unwrap(),
+            currency: record.get(7).unwrap().to_string().clone(),
+            state: record.get(8).unwrap().to_string().clone(),
+            balance: i32::from_str_radix(record.get(9).unwrap(), 10).unwrap(),
+        }
+    }
+
+}
+
+
+fn data_from_csv() -> Result<Vec<Entry>, Box<dyn Error>> {
+    let mut data_vector: Vec<Entry>= Vec::new();
+
+    let mut rdr = csv::Reader::from_reader(io::stdin());
+    for res in rdr.records() {
+        let record = res?;
+        // clone the fields of the record into the entry
+        data_vector.push(Entry::from(record));
+    }
+
+    Ok(data_vector)
+}
+
+fn summarise(data: Vec<Entry>) -> Result<HashMap<time::Month, Summary> , Box<dyn Error>> {
+
+}
+
 fn main (){
-    if let Err(err) = parse() {
+    if let Err(err) = data_from_csv() {
         println!("{}", err);
         process::exit(1);
     }
+
+    
 }
 
-fn parse() -> Result<(), Box<dyn Error>>{
-    let mut rdr = csv::Reader::from_reader(io::stdin());
-    // Loop over each record.
-    let format = time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
-    let mut map: HashMap<(i32, time::Month), i32> = HashMap::new();
-    let mut vendors: HashMap<String, i32> = HashMap::new();
 
-    for result in rdr.records() {
-        // An error may occur, the error is returhed after checking for it.
-        let record = result?;
-
-        let transaction_start = PrimitiveDateTime::parse(record.get(2)
-            .expect("Slice should not be empty"), &format)?;
-        let trans_month = (transaction_start.year(), transaction_start.month());
-        let occ = map.get(&trans_month);
-        if occ == None {
-            map.insert(trans_month, 1);
-        } else {
-            map.insert(trans_month, occ.unwrap() + 1);
-        }
-
-        let vendor: String = record.get(4).unwrap().to_string();
-        if !vendors.contains_key(&vendor) {
-            vendors.insert(vendor, 1);
-        } else {
-            vendors.insert(vendor.clone(), vendors.get(&vendor).unwrap() + 1);
-        }
-    }
-
-    for (key, val) in map.iter(){
-        println!("{:?} {:?}, {val}", key.0, key.1);
-    }
-    for (key, val) in vendors.iter(){
-        println!("{key}, {val}");
-    }
-    Ok(())
-}
