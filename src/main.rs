@@ -51,7 +51,15 @@ impl fmt::Display for Entry {
 
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?} spent at {:?}", self.amount, self.description)?;
-        Ok(())
+        return Ok(());
+    }
+}
+
+impl fmt::Display for Summary {
+
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "In: {:?}\n Out: {:?}\n", self.incoming, self.outgoing)?;
+        return Ok(());
     }
 }
 
@@ -100,8 +108,6 @@ fn summarise(entry_data: &Vec<Entry>) -> Result<HashMap<time::Month, Summary> , 
         }
         if food_stores.contains(&e.description.as_str()){
             overview_entry.food_total += e.amount;
-            println!("{e}");
-
         }
 
     }
@@ -117,7 +123,11 @@ fn main (){
     }
 
     println!("{:?}", data_vector.len());
-    let _ = summarise(data_vector.borrow());
+    let digest = summarise(data_vector.borrow()).unwrap();
+
+    for (key, value) in digest {
+        println!("{key}: {:?}", value.food_total);
+    }
 
 
     
