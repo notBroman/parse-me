@@ -81,15 +81,16 @@ fn data_from_csv(data_vector: &mut Vec<Entry>) -> Result<(), Box<dyn Error>> {
     return Ok(());
 }
 
-fn summarise(entry_data: &Vec<Entry>) -> Result<HashMap<time::Month, Summary> , Box<dyn Error>> {
-    let mut overview: HashMap<time::Month, Summary> = HashMap::new();
+fn summarise(entry_data: &Vec<Entry>) -> Result<HashMap<(time::Month, i32), Summary> , Box<dyn Error>> {
+    let mut overview: HashMap<(time::Month, i32), Summary> = HashMap::new();
     let food_stores: Vec<&str> = Vec::from(["Morrisons", "Tesco"
                                                 ,"Co-op", "Many Mart"
                                                 , "Lidl"]);
     
     for e in entry_data {
-        if !overview.contains_key(&e.started.month()) {
-            overview.insert(e.started.month().clone(), Summary {month: e.started.month().clone(),
+        let date_month: (time::Month, i32) = (e.started.month(), e.started.year());
+        if !overview.contains_key(date_month.borrow()) {
+            overview.insert(date_month.clone(), Summary {month: e.started.month().clone(),
                                                         food_total: 0.0,
                                                         misc_total: 0.0,
                                                         housing_total: 0.0,
@@ -98,7 +99,7 @@ fn summarise(entry_data: &Vec<Entry>) -> Result<HashMap<time::Month, Summary> , 
         }
     
         // reference the summary of the given month to update
-        let overview_entry: &mut Summary = overview.get_mut(&e.started.month()).unwrap();
+        let overview_entry: &mut Summary = overview.get_mut(date_month.borrow()).unwrap();
         // logic for adding to summary
         if e.amount < 0.0 {
             overview_entry.outgoing += e.amount;
@@ -126,7 +127,7 @@ fn main (){
     let digest = summarise(data_vector.borrow()).unwrap();
 
     for (key, value) in digest {
-        println!("{key}: {:?}", value.food_total);
+        println!("{:?}, {:?}: {:?}\n", key.0, key.1, value.food_total);
     }
 
 
