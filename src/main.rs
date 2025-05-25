@@ -1,10 +1,12 @@
 use core::fmt;
+use csv::{ReaderBuilder, StringRecord};
 use std::borrow::{Borrow, BorrowMut};
+use std::collections::HashMap;
 use std::str::FromStr;
 use std::{error::Error, io, process};
-use std::collections::HashMap;
-use time::{PrimitiveDateTime, parsing, formatting, macros};
-use csv::{ReaderBuilder, StringRecord};
+use time::{formatting, macros, parsing, PrimitiveDateTime};
+
+mod tui;
 
 struct Entry {
     what: String,
@@ -27,16 +29,18 @@ struct Summary {
     outgoing: f32,
 }
 
-
 impl From<StringRecord> for Entry {
-
     fn from(record: StringRecord) -> Self {
-        let format = time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
+        let format =
+            time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
         Entry {
             what: record.get(0).unwrap().to_string().clone(),
             product: record.get(1).unwrap().to_string().clone(),
-            started: PrimitiveDateTime::parse(record.get(2)
-                .expect("Slice should not be empty"), &format).unwrap(),
+            started: PrimitiveDateTime::parse(
+                record.get(2).expect("Slice should not be empty"),
+                &format,
+            )
+            .unwrap(),
             description: record.get(4).unwrap().to_string().clone(),
             amount: record.get(5).unwrap().parse().unwrap(),
             fee: record.get(6).unwrap().parse().unwrap(),
@@ -48,7 +52,6 @@ impl From<StringRecord> for Entry {
 }
 
 impl fmt::Display for Entry {
-
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?} spent at {:?}", self.amount, self.description)?;
         return Ok(());
@@ -56,13 +59,11 @@ impl fmt::Display for Entry {
 }
 
 impl fmt::Display for Summary {
-
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "In: {:?}\n Out: {:?}\n", self.incoming, self.outgoing)?;
         return Ok(());
     }
 }
-
 
 fn data_from_csv(data_vector: &mut Vec<Entry>) -> Result<(), Box<dyn Error>> {
     // allocate the vector to hold the data
@@ -81,42 +82,45 @@ fn data_from_csv(data_vector: &mut Vec<Entry>) -> Result<(), Box<dyn Error>> {
     return Ok(());
 }
 
-fn summarise(entry_data: &Vec<Entry>) -> Result<HashMap<(time::Month, i32), Summary> , Box<dyn Error>> {
+fn summarise(
+    entry_data: &Vec<Entry>,
+) -> Result<HashMap<(time::Month, i32), Summary>, Box<dyn Error>> {
     let mut overview: HashMap<(time::Month, i32), Summary> = HashMap::new();
-    let food_stores: Vec<&str> = Vec::from(["Morrisons", "Tesco"
-                                                ,"Co-op", "Many Mart"
-                                                , "Lidl"]);
-    
+    let food_stores: Vec<&str> = Vec::from(["Morrisons", "Tesco", "Co-op", "Many Mart", "Lidl"]);
+
     for e in entry_data {
         let date_month: (time::Month, i32) = (e.started.month(), e.started.year());
         if !overview.contains_key(date_month.borrow()) {
-            overview.insert(date_month.clone(), Summary {month: e.started.month().clone(),
-                                                        food_total: 0.0,
-                                                        misc_total: 0.0,
-                                                        housing_total: 0.0,
-                                                        incoming: 0.0,
-                                                        outgoing: 0.0});
+            overview.insert(
+                date_month.clone(),
+                Summary {
+                    month: e.started.month().clone(),
+                    food_total: 0.0,
+                    misc_total: 0.0,
+                    housing_total: 0.0,
+                    incoming: 0.0,
+                    outgoing: 0.0,
+                },
+            );
         }
-    
+
         // reference the summary of the given month to update
         let overview_entry: &mut Summary = overview.get_mut(date_month.borrow()).unwrap();
         // logic for adding to summary
         if e.amount < 0.0 {
             overview_entry.outgoing += e.amount;
-        }
-        else {
+        } else {
             overview_entry.incoming += e.amount;
         }
-        if food_stores.contains(&e.description.as_str()){
+        if food_stores.contains(&e.description.as_str()) {
             overview_entry.food_total += e.amount;
         }
-
     }
 
     return Ok(overview);
 }
 
-fn main (){
+fn main() {
     let mut data_vector: Vec<Entry> = Vec::new();
     if let Err(err) = data_from_csv(data_vector.borrow_mut()) {
         println!("{}", err);
@@ -129,9 +133,5 @@ fn main (){
     for (key, value) in digest {
         println!("{:?}, {:?}: {:?}\n", key.0, key.1, value.food_total);
     }
-
-
-    
+    tui::func();
 }
-
-
