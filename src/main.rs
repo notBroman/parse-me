@@ -121,17 +121,17 @@ fn summarise(
 }
 
 fn main() {
-    let mut data_vector: Vec<Entry> = Vec::new();
-    if let Err(err) = data_from_csv(data_vector.borrow_mut()) {
-        println!("{}", err);
-        process::exit(1);
-    }
-
-    println!("{:?}", data_vector.len());
-    let digest = summarise(data_vector.borrow()).unwrap();
-
-    for (key, value) in digest {
-        println!("{:?}, {:?}: {:?}\n", key.0, key.1, value.food_total);
-    }
+    // let mut data_vector: Vec<Entry> = Vec::new();
+    // if let Err(err) = data_from_csv(data_vector.borrow_mut()) {
+    //     println!("{}", err);
+    //     process::exit(1);
+    // }
+    //
+    // println!("{:?}", data_vector.len());
+    // let digest = summarise(data_vector.borrow()).unwrap();
+    //
+    // for (key, value) in digest {
+    //     println!("{:?}, {:?}: {:?}\n", key.0, key.1, value.food_total);
+    // }
     tui::func();
 }
