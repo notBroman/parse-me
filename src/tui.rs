@@ -7,7 +7,10 @@ use tui::{
 };
 
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    event::{
+        self, DisableFocusChange, DisableMouseCapture, EnableFocusChange, EnableMouseCapture,
+        Event, KeyCode,
+    },
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
@@ -15,24 +18,36 @@ use crossterm::{
 pub fn func() {
     println!("Hello from tui!");
 
-    enable_raw_mode();
+    let _ = enable_raw_mode();
     let mut stdout = io::stdout();
-    execute!(stdout, EnterAlternateScreen, EnableMouseCapture);
+    let _ = execute!(stdout, EnterAlternateScreen, EnableMouseCapture);
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend).expect("Error when creating terminal");
 
-    terminal.draw(|f| ui(f)).expect("Error when drawing box");
+    loop {
+        let _ = terminal.draw(|f| ui(f)).expect("Error when drawing box");
 
-    thread::sleep(Duration::from_millis(5000));
+        match event::read() {
+            Err(e) => {}
+            Ok(event) => match event {
+                Event::Key(key) => {
+                    if key == KeyCode::Esc.into() {
+                        break;
+                    }
+                }
+                _ => {}
+            },
+        };
+    }
 
-    disable_raw_mode();
-    execute!(
+    let _ = disable_raw_mode();
+    let _ = execute!(
         terminal.backend_mut(),
         LeaveAlternateScreen,
         DisableMouseCapture
     );
 
-    terminal.show_cursor();
+    let _ = terminal.show_cursor();
 }
 
 pub fn ui<B: Backend>(f: &mut Frame<B>) {

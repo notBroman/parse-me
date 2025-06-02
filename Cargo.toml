@@ -8,7 +8,11 @@ edition = "2021"
 [dependencies]
 csv = "1.3.0"
 time = { version = "0.3.36", default_features = true, features = ["formatting", "parsing", "macros"] }
-tui = {version = "0.19", default_features = true, fatures = ["event-stream"] }
-crossterm = {version = "0.25"}
-tokio = {version = "1", feature = ["full"] }
+tui = {version = "0.19", default_features = true }
+crossterm = {version = "0.25", fatures = ["event-stream", "events"]}
+
+# futures = {version = "0.3.0", default_features = true}
+# futures-timer = "3.0"
+# tokio = {version = "1.0.0", features = ["full"] }
+# tokio-stream = {version = "0.1.17"}
 

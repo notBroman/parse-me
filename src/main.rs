@@ -1,10 +1,12 @@
+#![allow(warnings)]
 use core::fmt;
 use csv::{ReaderBuilder, StringRecord};
-use std::borrow::{Borrow, BorrowMut};
+use std::borrow::Borrow;
 use std::collections::HashMap;
-use std::str::FromStr;
-use std::{error::Error, io, process};
-use time::{formatting, macros, parsing, PrimitiveDateTime};
+use std::{error::Error, io};
+use time::{Duration, PrimitiveDateTime};
+
+// async crates
 
 mod tui;
 
