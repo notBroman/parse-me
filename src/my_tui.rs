@@ -2,7 +2,8 @@ use std::{io, thread, time::Duration};
 use tui::{
     backend::{Backend, CrosstermBackend},
     layout::{Constraint, Direction, Layout},
-    widgets::{self, Block, Borders},
+    style::*,
+    widgets::{self, Block, Borders, List, ListItem},
     Frame, Terminal,
 };
 
@@ -54,12 +55,23 @@ pub fn ui<B: Backend>(f: &mut Frame<B>) {
     let chunk = Layout::default()
         .direction(Direction::Vertical)
         .margin(1)
-        .constraints([Constraint::Percentage(20), Constraint::Percentage(80)].as_ref())
+        .constraints([Constraint::Percentage(10), Constraint::Percentage(90)].as_ref())
         .split(f.size());
 
-    let block = Block::default().title("Block").borders(Borders::ALL);
+    let block = Block::default().title("Header").borders(Borders::ALL);
     f.render_widget(block, chunk[0]);
 
-    let block2 = Block::default().title("Block2").borders(Borders::ALL);
-    f.render_widget(block2, chunk[1]);
+    // use ListState to keep track of what is selected
+    let items = [
+        ListItem::new("Item 1"),
+        ListItem::new("Item 2"),
+        ListItem::new("Item 3"),
+    ];
+
+    let list = List::new(items)
+        .block(Block::default().title("List").borders(Borders::ALL))
+        .style(Style::default().fg(Color::White))
+        .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
+        .highlight_symbol(">");
+    f.render_widget(list, chunk[1]);
 }
