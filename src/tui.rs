@@ -21,13 +21,7 @@ pub fn func() {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend).expect("Error when creating terminal");
 
-    terminal
-        .draw(|f| {
-            let size = f.size();
-            let block = Block::default().title("Block").borders(Borders::ALL);
-            f.render_widget(block, size);
-        })
-        .expect("Error when drawing box");
+    terminal.draw(|f| ui(f)).expect("Error when drawing box");
 
     thread::sleep(Duration::from_millis(5000));
 
@@ -39,4 +33,18 @@ pub fn func() {
     );
 
     terminal.show_cursor();
+}
+
+pub fn ui<B: Backend>(f: &mut Frame<B>) {
+    let chunk = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints([Constraint::Percentage(20), Constraint::Percentage(80)].as_ref())
+        .split(f.size());
+
+    let block = Block::default().title("Block").borders(Borders::ALL);
+    f.render_widget(block, chunk[0]);
+
+    let block2 = Block::default().title("Block2").borders(Borders::ALL);
+    f.render_widget(block2, chunk[1]);
 }
