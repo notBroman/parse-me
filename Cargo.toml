@@ -1,6 +1,6 @@
 [package]
 name = "parse-me"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 csv = "1.3.0"
 time = { version = "0.3.36", default_features = true, features = ["formatting", "parsing", "macros"] }
-tui = {version = "0.19"}
+tui = {version = "0.19", default_features = true, fatures = ["event-stream"] }
 crossterm = {version = "0.25"}
+tokio = {version = "1", feature = ["full"] }
 
