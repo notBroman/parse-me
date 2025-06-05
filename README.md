@@ -4,13 +4,13 @@ This is a tool to manage spending. It provides a terminal user interface and dis
 
 # Roadmap
 
-[ ] Select an element from a list
-[ ] Browse files to select a file with data to load
-[ ] Display data
-[ ] Categorise spending
+- [ ] Select an element from a list
+- [ ] Browse files to select a file with data to load
+- [ ] Display data
+- [ ] Categorise spending
 
-[ ] Display a summary 
-[ ] Save a summary
-[ ] Save a config file
+- [ ] Display a summary 
+- [ ] Save a summary
+- [ ] Save a config file
 
 
