@@ -6,12 +6,12 @@ use std::collections::HashMap;
 use std::{error::Error, io};
 use time::{Duration, PrimitiveDateTime};
 
-mod entry;
-use entry::Entry;
+mod expenditure;
+use expenditure::Expenditure;
 
 mod my_tui;
 
-fn data_from_csv(data_vector: &mut Vec<Entry>) -> Result<(), Box<dyn Error>> {
+fn data_from_csv(data_vector: &mut Vec<Expenditure>) -> Result<(), Box<dyn Error>> {
     // allocate the vector to hold the data
 
     // read all the data into the vactor from the csv file
@@ -20,7 +20,7 @@ fn data_from_csv(data_vector: &mut Vec<Entry>) -> Result<(), Box<dyn Error>> {
         let record = res?;
         // clone the fields of the record into the entry
         if record.get(9).unwrap() != "" {
-            data_vector.push(Entry::from(record));
+            data_vector.push(Expenditure::from(record));
         }
     }
     data_vector.shrink_to_fit();

@@ -3,7 +3,7 @@ use csv::StringRecord;
 use std::{error::Error, io};
 use time::{Duration, PrimitiveDateTime};
 
-pub struct Entry {
+pub struct Expenditure {
     what: String,
     product: String,
     started: PrimitiveDateTime,
@@ -24,11 +24,11 @@ pub struct Summary {
     outgoing: f32,
 }
 
-impl From<StringRecord> for Entry {
+impl From<StringRecord> for Expenditure {
     fn from(record: StringRecord) -> Self {
         let format =
             time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
-        Entry {
+        Expenditure {
             what: record.get(0).unwrap().to_string().clone(),
             product: record.get(1).unwrap().to_string().clone(),
             started: PrimitiveDateTime::parse(
@@ -46,7 +46,7 @@ impl From<StringRecord> for Entry {
     }
 }
 
-impl fmt::Display for Entry {
+impl fmt::Display for Expenditure {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?} spent at {:?}", self.amount, self.description)?;
         return Ok(());
