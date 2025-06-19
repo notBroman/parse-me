@@ -1,4 +1,5 @@
-use std::{io, thread, time::Duration};
+use std::{fs, io, thread, time::Duration};
+
 use tui::{
     backend::{Backend, CrosstermBackend},
     layout::{Constraint, Direction, Layout},
@@ -88,12 +89,21 @@ pub fn func() {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend).expect("Error when creating terminal");
 
+    let mut names: Vec<String> = vec![];
+
+    for f in fs::read_dir("./data/").expect("Empty directory") {
+        names.push(
+            f.expect("Not an entry")
+                .file_name()
+                .to_str()
+                .unwrap()
+                .clone()
+                .to_owned(),
+        );
+    }
+
     // use ListState to keep track of what is selected
-    let mut items = MyItem::new(vec![
-        String::from("Item 1"),
-        String::from("Item 2"),
-        String::from("Item 3"),
-    ]);
+    let mut items = MyItem::new(names);
 
     loop {
         let _ = terminal
